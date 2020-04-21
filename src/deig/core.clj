@@ -36,7 +36,17 @@
   "Creates a mutated version of an individual's pixel. Mutates each channel randomly."
   (let [mutation-rate 0.2]
     (if (< (rand) mutation-rate)
-      (vec (map (fn [channel] (rand-int 256) pixel)))
+      ;; Case where the pixel mutates, you change each of its color channels
+      (vec (map (fn [channel]
+                  ;; Our changes to the color are bounded within a range of (-30, 30)
+                  (let [change (+ (* (- 30 -30) (rand)) -30)]
+                    (cond
+                      ;; If the change is outside of our range, stick to our range
+                      (> (+ channel change) 255) 255
+                      (< (+ channel change) 0) 0
+                      ;; Otherwise, just use the change
+                      :else (+ channel change)))) pixel))
+      ;; Case where it doesn't
       pixel)))
 
 (defn mutate-uniform [genome]
@@ -50,7 +60,7 @@
        genome))
 
 (defn mutate [genome]
-  "Randomly selects a mutation to mutate an image by"
+  "Randomly selects a mutation to mutate an image with"
   (let [type (rand)]
     (cond
       (< type 0.2) (mutate-uniform genome)
