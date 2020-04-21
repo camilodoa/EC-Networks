@@ -74,6 +74,15 @@
     {:genome  new-genome
      :fitness (fitness new-genome)}))
 
+(defn populate [population-size]
+  (repeatedly population-size
+              #(new-individual 28 :grayscale true)))
+
+(defn re-populate [population population-size]
+  (conj (repeatedly (dec population-size)
+                    #(make-child population))
+        (fittest population)))
+
 ;; Output
 (defn report [generation population]
   "Prints a report on the status of the population at the given generation."
@@ -83,15 +92,12 @@
 (defn evolve [population-size generations]
   "Runs a genetic algorithm to generate an image according to the
   criteria of a deep classifier model."
-  (loop [population (repeatedly population-size
-                                #(new-individual 28 :grayscale true))
+  (loop [population (populate population-size)
          generation 0]
     (report generation population)
     (if (>= generation generations)
       (fittest population)
-      (recur (conj (repeatedly (dec population-size)
-                               #(make-child population))
-                   (fittest population))
+      (recur (re-populate population population-size)
              (inc generation)))))
 
 (defn -main
