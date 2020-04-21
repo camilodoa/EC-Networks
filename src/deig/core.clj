@@ -28,20 +28,19 @@
           individuals))
 
 (defn select [population]
-  "Returns an individual selected from population using a tournament."
-  (fittest (repeatedly 2 #(rand-nth population))))
+  "Returns an individual selected from population using a tournament of 10."
+  (fittest (repeatedly 10 #(rand-nth population))))
 
 ;; Mutation
 (defn mutate-channel [pixel]
-  "Creates a mutated version of an individual's pixel"
-  ;; Whether a mutation should occur
-  (if (< (rand) 0.2)
-    ;; If a mutation occurs, make it binary
-    (vec (map (fn [channel] (if (< (rand) 0.5) 255 0) pixel)))
-    pixel))
+  "Creates a mutated version of an individual's pixel. Mutates each channel randomly."
+  (let [mutation-rate 0.2]
+    (if (< (rand) mutation-rate)
+      (vec (map (fn [channel] (rand-int 256) pixel)))
+      pixel)))
 
-(defn mutate [genome]
-  "Randomly mutates an image by changing each pixel channel by a random amount"
+(defn mutate-uniform [genome]
+  "Mutate each pixel in genome with the same mutation rate."
   (map (fn [column]
          (map
            (fn [row]
@@ -50,24 +49,18 @@
          column)
        genome))
 
-(defn crossover
-  [g1 g2]
-  (map (fn [column1 column2]
-         (map
-           (fn [row1 row2]
-             (map (fn [channel1 channel2] (if (rand-nth '[true false]) channel1 channel2))
-                  row1
-                  row2)))
-         column1
-         column2)
-       g1
-       g2))
+(defn mutate [genome]
+  "Randomly selects a mutation to mutate an image by"
+  (let [type (rand)]
+    (cond
+      (< type 0.2) (mutate-uniform genome)
+      ;; More mutations
+      :else (mutate-uniform genome))))
 
 (defn make-child [population]
   "Returns a new, evaluated child, produced by mutating the result
   of crossing over parents that are selected from the given population."
-  (let [new-genome (vec (mutate (crossover (:genome (select population))
-                                           (:genome (select population)))))]
+  (let [new-genome (vec (mutate (:genome (select population))))]
     {:genome  new-genome
      :fitness (fitness new-genome)}))
 
