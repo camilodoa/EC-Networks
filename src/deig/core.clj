@@ -5,7 +5,7 @@
 (defn grayscale-genome [dimension]
   "Returns random grayscale genome of dimensions dimension*dimension"
   (vec (repeatedly dimension
-                   #(vec (repeatedly dimension (fn [] (vector (rand-int 256))))))))
+                   #(vec (repeatedly dimension (fn [] (vector (rand-nth [0 0 0 0 0 255]))))))))
 
 (defn rbg-genome [dimension]
   "Returns random grayscale genome of dimensions dimension*dimension"
@@ -30,6 +30,12 @@
 (defn select [population]
   "Returns an individual selected from population using a tournament of 10."
   (fittest (repeatedly 10 #(rand-nth population))))
+
+(defn abs [val]
+  "Absolute value function."
+  (if (< val 0)
+    (* val -1)
+    val))
 
 ;; Mutation
 (defn mutate-channel [pixel]
@@ -59,25 +65,18 @@
          row)
        genome))
 
-(defn abs [val]
-  "Absolute value function."
-  (if (< val 0)
-    (* val -1)
-    val))
 
 (defn mutate-chunk [genome]
   "Mutate a random 3x3 square in a random spot of the genome"
   (let [parent-pixel-location [(rand-int (count genome)) (rand-int (count (first genome)))]
         parent-pixel (nth (nth genome (first parent-pixel-location)) (second parent-pixel-location))]
-    (vec (map-indexed (fn [i row]
-                   (vec (map-indexed (fn [j pixel]
+    (map-indexed (fn [i col]
+                   (map-indexed (fn [j pixel]
                                   (if (and
                                         (<= (abs (- i (first parent-pixel-location))) 1)
                                         (<= (abs (- j (second parent-pixel-location))) 1))
                                     parent-pixel
-                                    pixel))
-                                row)))
-                 genome))))
+                                    pixel)) col)) genome)))
 
 (defn mutate-black-horizontal-line [genome]
   "Mutates a straight horizontal line"
@@ -92,14 +91,27 @@
                                               (if (and (<= start j))(>= end j))
                                               [255]
                                               pixel) row))
-                          row)) genome))))
+                          row))
+                      genome))))
+
+(defn mutate-white-line [genome]
+  "Returns a genome with a centered vertical white line."
+  (let [width (rand-nth [1 2 3])
+        x-start (rand-int (count (first genome)))
+        height (rand-int (count genome))
+        y-start (rand-int (count genome))]
+    (vec (map-indexed (fn [i col]
+                        (map-indexed (fn [j pixel]
+                                       (if (and (< j (+ x-start width)) (> j x-start) (> i y-start) (< i (+ y-start height)))
+                                         [255]
+                                         pixel)) col)) genome))))
 
 (defn mutate [genome]
   "Randomly selects a mutation to mutate an image with"
   (let [type (rand)]
     (cond
        (< type 0.2) (mutate-chunk genome)
-      (and (> type 0.2) (< type 0.4)) (mutate-black-horizontal-line genome)
+      (and (> type 0.2) (< type 0.4)) (mutate-white-line genome)
       :else (mutate-uniform genome))))
 
 (defn make-child [population]
@@ -142,7 +154,7 @@
   "Run the evolutionary algorithm"
   []
   (println "Starting evolution.")
-  (evolve 200 100))
+  (evolve 300 50))
 
 ;: Evolve.
 #_(-main)

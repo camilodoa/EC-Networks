@@ -8,12 +8,14 @@ from keras.models import Sequential
 from keras.layers import Dense, Dropout, Flatten
 from keras.layers import Conv2D, MaxPooling2D
 from keras import backend as K
+import numpy as np
+
 
 batch_size = 128
 num_classes = 10
 # Only 2 epochs so we can avoid a NaN collapse because we're using a
 # sigmoid activation function
-epochs = 2
+epochs = 1
 
 # input image dimensions
 img_rows, img_cols = 28, 28
@@ -63,6 +65,7 @@ model.fit(x_train, y_train,
           epochs=epochs,
           verbose=1,
           validation_data=(x_test, y_test))
+
 score = model.evaluate(x_test, y_test, verbose=0)
 model.save('./mnist.h5')
 print('Test loss:', score[0])

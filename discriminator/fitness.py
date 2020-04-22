@@ -17,7 +17,7 @@ def fitness(img):
     x = image.img_to_array(img)
     x = np.expand_dims(x, axis=0)
 
-    model = load_model('model.h5', compile=False)
+    model = load_model('./mnist.h5')
 
     # This prediction variable is not used in fitness calculation
     prediction = model.predict_classes(x)
@@ -31,18 +31,12 @@ def fitness(img):
     print('Fitness is', fitness)
     return fitness
 
-
 if __name__ == '__main__':
     'Sample usage'
 
-    # Find a random image from dataset
-    d = Discriminator()
-    for _, dirnames, filenames in os.walk(d.dataset / 'test'):
-        example = random.choice(filenames)
+    # Load file from HD
+    img = image.load_img('test.jpg',
+                        target_size=(28, 28), color_mode="grayscale")
 
-        # Load file from HD
-        img = image.load_img(d.dataset / 'test' / example,
-                            target_size=(28, 28), color_mode="grayscale")
-
-        # Pass image to our fitness function
-        fitness(img)
+    # Pass image to our fitness function
+    fitness(img)
