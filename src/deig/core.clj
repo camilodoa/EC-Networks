@@ -51,12 +51,12 @@
 
 (defn mutate-uniform [genome]
   "Mutate each pixel in genome with the same mutation rate."
-  (map (fn [column]
+  (map (fn [row]
          (map
-           (fn [row]
+           (fn [column]
              (map (fn [channel] (mutate-channel channel))
-                  row)))
-         column)
+                  column)))
+         row)
        genome))
 
 (defn abs [val]
@@ -69,18 +69,37 @@
   "Mutate a random 3x3 square in a random spot of the genome"
   (let [parent-pixel-location [(rand-int (count genome)) (rand-int (count (first genome)))]
         parent-pixel (nth (nth genome (first parent-pixel-location)) (second parent-pixel-location))]
-    (map-indexed (fn [i col]
-                   (map-indexed (fn [j pixel]
-                                  (if (and (<= (abs (- i (first parent-pixel-location))) 1) (<= (abs (- j (second parent-pixel-location))) 1))
+    (vec (map-indexed (fn [i row]
+                   (vec (map-indexed (fn [j pixel]
+                                  (if (and
+                                        (<= (abs (- i (first parent-pixel-location))) 1)
+                                        (<= (abs (- j (second parent-pixel-location))) 1))
                                     parent-pixel
-                                    pixel)) col)) genome)))
+                                    pixel))
+                                row)))
+                 genome))))
+
+(defn mutate-black-horizontal-line [genome]
+  "Mutates a straight horizontal line"
+  (let [x1 (rand-int (count (first genome)))
+        x2 (rand-int (count (first genome)))
+        start (min x1 x2)
+        end (max x1 x2)
+        height (rand-int (count genome))]
+    (vec (map-indexed (fn [i row]
+                        (if (= i height)
+                          (vec (map-indexed (fn [j pixel]
+                                              (if (and (<= start j))(>= end j))
+                                              [255]
+                                              pixel) row))
+                          row)) genome))))
 
 (defn mutate [genome]
   "Randomly selects a mutation to mutate an image with"
   (let [type (rand)]
     (cond
-      (< type 0.2) (mutate-uniform genome)
-      (and (> type 0.2) (< type 0.4)) (mutate-chunk genome)
+       (< type 0.2) (mutate-chunk genome)
+      (and (> type 0.2) (< type 0.4)) (mutate-black-horizontal-line genome)
       :else (mutate-uniform genome))))
 
 (defn make-child [population]
@@ -104,7 +123,8 @@
 ;; Output
 (defn report [generation population]
   "Prints a report on the status of the population at the given generation."
-  (println {:generation generation :best-fitness (:fitness (fittest population))}))
+  (println {:generation generation
+            :best-fitness (:fitness (fittest population))}))
 
 ;; Main functions
 (defn evolve [population-size generations]
@@ -122,7 +142,7 @@
   "Run the evolutionary algorithm"
   []
   (println "Starting evolution.")
-  (evolve 2 20000))
+  (evolve 200 100))
 
 ;: Evolve.
 #_(-main)
