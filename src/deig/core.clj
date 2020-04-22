@@ -59,12 +59,28 @@
          column)
        genome))
 
+(defn abs [val]
+  "Absolute value function."
+  (if (< val 0)
+    (* val -1)
+    val))
+
+(defn mutate-chunk [genome]
+  "Mutate a random 3x3 square in a random spot of the genome"
+  (let [parent-pixel-location [(rand-int (count genome)) (rand-int (count (first genome)))]
+        parent-pixel (nth (nth genome (first parent-pixel-location)) (second parent-pixel-location))]
+    (map-indexed (fn [i col]
+                   (map-indexed (fn [j pixel]
+                                  (if (and (<= (abs (- i (first parent-pixel-location))) 1) (<= (abs (- j (second parent-pixel-location))) 1))
+                                    parent-pixel
+                                    pixel)) col)) genome)))
+
 (defn mutate [genome]
   "Randomly selects a mutation to mutate an image with"
   (let [type (rand)]
     (cond
       (< type 0.2) (mutate-uniform genome)
-      ;; More mutations
+      (and (> type 0.2) (< type 0.4)) (mutate-chunk genome)
       :else (mutate-uniform genome))))
 
 (defn make-child [population]
@@ -75,10 +91,12 @@
      :fitness (fitness new-genome)}))
 
 (defn populate [population-size]
+  "Returns new population of random images"
   (repeatedly population-size
               #(new-individual 28 :grayscale true)))
 
 (defn re-populate [population population-size]
+  "Returns population of individuals based on fitness selection"
   (conj (repeatedly (dec population-size)
                     #(make-child population))
         (fittest population)))
@@ -104,7 +122,7 @@
   "Run the evolutionary algorithm"
   []
   (println "Starting evolution.")
-  (evolve 1000 30))
+  (evolve 2 20000))
 
 ;: Evolve.
 #_(-main)
