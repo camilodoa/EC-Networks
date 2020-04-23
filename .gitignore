@@ -1,7 +1,5 @@
 .DS_Store
 datasets/africa_fabric
-*.jpg
-*.jpg
 __pycache__/
 /target
 /classes

@@ -23,8 +23,11 @@ def fitness(img):
     prediction = model.predict_classes(x)
     print('Prediction is ', prediction)
 
-    probabilities = model.predict_proba(x)[0]
+    probabilities = model.predict_proba(x, verbose=1)[0]
     print('Probabilities are', probabilities)
+
+    predictions = model.predict(x)
+    print('New prediction is', predictions)
 
     # Fitness is calculated 0-100, where 100 is perfect and 0 is very bad
     fitness = max(probabilities) * 100
