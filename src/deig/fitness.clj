@@ -20,6 +20,17 @@
           fitness (* (apply max probabilities) 100)]
          fitness))
 
+(defn predict-class [img]
+ "Evaluate an image based on its best categorical score"
+   (let [x-array (image-processing/img_to_array img)
+         x (np/expand_dims (np/array x-array) 0)
+         class (first (call-attr model "predict_classes" x))]
+        class))
+
+(defn save-image [genome generation class]
+  "Save individual's genome to file"
+  (call-attr (image-processing/array_to_img genome) "save" (str "./individuals/gen" generation "predicted" class ".png")))
+
 ;; Example code
 (defn grayscale-genome [dimension]
   "Returns random grayscale genome of dimensions dimension*dimension"
@@ -43,4 +54,3 @@
 
 ;: Should return 100.
 #_ (trial)                                                  ;
-

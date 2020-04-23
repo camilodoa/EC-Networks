@@ -1,5 +1,5 @@
 (ns deig.core
-  (:require [deig.fitness :refer [fitness]]))
+  (:require [deig.fitness :refer [fitness save-image predict-class]]))
 
 ;; Individual creation
 (defn grayscale-genome [dimension]
@@ -36,6 +36,10 @@
   (if (< val 0)
     (* val -1)
     val))
+
+  (defn partitionv [n x]
+    "Partitions into vecs within vecs"
+    (mapv #(vec %) (partition n x)))
 
 ;; Mutation
 (defn mutate-channel [pixel]
@@ -78,21 +82,6 @@
                                     parent-pixel
                                     pixel)) col)) genome)))
 
-(defn mutate-black-horizontal-line [genome]
-  "Mutates a straight horizontal line"
-  (let [x1 (rand-int (count (first genome)))
-        x2 (rand-int (count (first genome)))
-        start (min x1 x2)
-        end (max x1 x2)
-        height (rand-int (count genome))]
-    (vec (map-indexed (fn [i row]
-                        (if (= i height)
-                          (vec (map-indexed (fn [j pixel]
-                                              (if (and (<= start j))(>= end j))
-                                              [255]
-                                              pixel) row))
-                          row))
-                      genome))))
 
 (defn mutate-white-line [genome]
   "Returns a genome with a centered vertical white line."
@@ -135,8 +124,14 @@
 ;; Output
 (defn report [generation population]
   "Prints a report on the status of the population at the given generation."
-  (println {:generation generation
-            :best-fitness (:fitness (fittest population))}))
+  (let [fittest (fittest population)
+        predicted-class (predict-class (:genome fittest))]
+        ;; Save image to file
+        (save-image (:genome fittest) generation predicted-class)
+        ;; Print stats
+        (println {:generation generation
+                  :best-fitness (:fitness fittest)
+                  :predicted-class predicted-class})))
 
 ;; Main functions
 (defn evolve [population-size generations]
@@ -150,9 +145,8 @@
       (recur (re-populate population population-size)
              (inc generation)))))
 
-(defn -main
+(defn -main []
   "Run the evolutionary algorithm"
-  []
   (println "Starting evolution.")
   (evolve 300 50))
 
