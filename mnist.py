@@ -1,5 +1,5 @@
-# Keras code from https://keras.io/examples/mnist_cnn/
-# Optimized for MNIST dataset
+# Base of code from https://keras.io/examples/mnist_cnn/
+# Changed for our needs
 
 from __future__ import print_function
 import keras
@@ -13,8 +13,6 @@ import numpy as np
 
 batch_size = 128
 num_classes = 10
-# Only 2 epochs so we can avoid a NaN collapse because we're using a
-# sigmoid activation function
 epochs = 10
 
 # input image dimensions
@@ -54,6 +52,7 @@ model.add(Dropout(0.25))
 model.add(Flatten())
 model.add(Dense(128, activation='relu'))
 model.add(Dropout(0.5))
+# Using softmax output layer activation for a probability output
 model.add(Dense(num_classes, activation='softmax'))
 
 model.compile(loss=keras.losses.categorical_crossentropy,
