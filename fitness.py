@@ -1,3 +1,7 @@
+'''
+This code is the python version of fitness.clj
+'''
+
 # Utility imports for the example
 from discriminator import Discriminator
 import os

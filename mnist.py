@@ -15,7 +15,7 @@ batch_size = 128
 num_classes = 10
 # Only 2 epochs so we can avoid a NaN collapse because we're using a
 # sigmoid activation function
-epochs = 1
+epochs = 10
 
 # input image dimensions
 img_rows, img_cols = 28, 28

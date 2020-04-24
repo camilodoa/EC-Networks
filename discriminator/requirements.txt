@@ -1,8 +1,0 @@
-tensorflow==2.0
-numpy
-pathlib
-keras_preprocessing
-matplotlib
-h5py
-pillow
-keras

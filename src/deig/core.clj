@@ -44,7 +44,7 @@
 ;; Mutation
 (defn mutate-channel [pixel]
   "Creates a mutated version of an individual's pixel. Mutates each channel randomly."
-  (let [mutation-rate 0.2]
+  (let [mutation-rate 0.1]
     (if (< (rand) mutation-rate)
       ;; Case where the pixel mutates, you change each of its color channels
       (vec (map (fn [channel]
@@ -83,16 +83,17 @@
                                     pixel)) col)) genome)))
 
 
-(defn mutate-white-line [genome]
+(defn mutate-line [genome]
   "Returns a genome with a centered vertical white line."
   (let [width (rand-nth [1 2 3])
         x-start (rand-int (count (first genome)))
         height (rand-int (count genome))
-        y-start (rand-int (count genome))]
+        y-start (rand-int (count genome))
+        color (rand-nth [255 255 255 0])]
     (vec (map-indexed (fn [i col]
                         (map-indexed (fn [j pixel]
                                        (if (and (< j (+ x-start width)) (> j x-start) (> i y-start) (< i (+ y-start height)))
-                                         [255]
+                                         [color]
                                          pixel)) col)) genome))))
 
 (defn mutate [genome]
@@ -100,7 +101,7 @@
   (let [type (rand)]
     (cond
        (< type 0.2) (mutate-chunk genome)
-      (and (> type 0.2) (< type 0.4)) (mutate-white-line genome)
+      (and (> type 0.2) (< type 0.4)) (mutate-line genome)
       :else (mutate-uniform genome))))
 
 (defn make-child [population]

@@ -2,23 +2,57 @@
 
 ## About
 
-We're creating an efficient GAN-alternative technique that leverages evolution for image generation. We are evolving a population of images by using a discriminator output as their "fitness" and updating them with random mutation/recombination at each generational step.
+We are evolving a population of images according to the criteria of a deep CNN classifier trained on a MNIST dataset. Our goal is producing artificial images that fool high-accuracy classifiers.
 
-## Teams
+Our evolutionary algorithm is found in `src/deig/core.clj`. The fitness function `src/deig/fitness.clj` is based on `fitness.py`. Our mnist model is trained with `mnist.py` and saved to `mnist.h5`.
 
-1. Random image creation with Clojure (Caroline)
+## Installation
 
-2. Editing images with Clojure (Ben) (maybe the [imagez](https://github.com/mikera/imagez) library can help!)
+You'll need the following software to run our system.
 
-3. Researching what best criteria of repopulation we want to use (and writing it!) (i.e. elitism, recombination, mutation, etc) (Sunghoon)
+#### Clojure and Leinigen
 
-4. Writing the discriminator and the fitness API (Camilo)
+You can either download the Clojure interpreter, or you can use IntelliJ IDEA with the Cursive plugin.
 
-5. Use of Python functions in a Clojure script (Sergei)
+If you want to go the terminal route, here is what you should run:
 
-6. Writing/sketching out the skeleton of our evolutionary algorithm with pretend APIs (Mahran)
+```bash
+brew install clojure # Download Clojure interpreter
+brew install leiningen # Download Leinigen project manager
+lein deps # Install our clojure dependencies
+```
+
+#### Python3
+
+You'll also need Python3 to train a new mnist classifier and to use our fitness function.
+
+```bash
+brew install python3 # Download Python3 interpreter
+pip3 install -r requirements.txt # Install our python dependencies
+```
+
+## Running
+
+If you want **to train a new classifier model**, do
+
+```bash
+python3 mnist.py
+```
+
+This will save a new `mnist.h5` that our evolutionary algorithm will use for its fitness. To change the model that gets trained, edit the code in `mnist.py`. If you want to test your model on a sample image after training it, run `fitness.py`. This will use your model to predict `test.jpg`'s classes.
+
+
+To **run our genetic algorithm**, do
+
+```bash
+lein run # Runs (-main) in deig.core
+```
+
+This will run our genetic algorithm with a preset population and generation cap. If you want to edit these parameters, change `(-main)` in `src/deig/core.clj`. High-fitness individuals are saved in `individuals/`.
 
 ## Getting started with git
+
+### Vanilla git
 
 First, install [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) so you can access it in your shell (alternatively you can use a git-helper application like [GitHub Desktop](https://desktop.github.com/)). If you have a Mac, I would recommend installing [Homebrew](https://brew.sh/), and then running
 
@@ -52,8 +86,6 @@ For simple merging you want to do:
 git push
 ```
 
-## Installation
-
 ### git-lfs
 
 You'll need Git Large File Storage. [Install](https://git-lfs.github.com/) it.
@@ -66,26 +98,6 @@ git lfs install
 
 [This](https://medium.com/@AyunasCode/how-to-push-large-files-to-github-253d05cc6a09) is a good tutorial for how to commit really large files.
 
-### Clojure
-
-```bash
-brew install clojure
-brew install leiningen
-lein deps
-```
-
-### Python3
-
-```bash
-brew install python3
-pip3 install -r requirements.txt
-```
-
-## Running
-
-```bash
-lein run
-```
 
 ## Notes
 
