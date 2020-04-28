@@ -5,7 +5,7 @@
 (defn grayscale-genome [dimension]
   "Returns random grayscale genome of dimensions dimension*dimension"
   (vec (repeatedly dimension
-                   #(vec (repeatedly dimension (fn [] (vector (rand-nth [0 0 0 0 0 255]))))))))
+                   #(vec (repeatedly dimension (fn [] (vector (rand-nth [0]))))))))
 
 (defn rbg-genome [dimension]
   "Returns random grayscale genome of dimensions dimension*dimension"
