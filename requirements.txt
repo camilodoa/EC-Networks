@@ -4,5 +4,5 @@ pathlib
 keras_preprocessing
 matplotlib
 h5py
-pillow
+Pillow
 keras
