@@ -1,4 +1,4 @@
-# Base of code from https://keras.io/examples/mnist_cnn/
+
 # Changed for our needs
 
 from __future__ import print_function
@@ -8,17 +8,27 @@ from keras.models import Sequential
 from keras.layers import Dense, Dropout, Flatten
 from keras.layers import Conv2D, MaxPooling2D
 from keras import backend as K
+import numpy as np
 
 
 batch_size = 128
-num_classes = 10
-epochs = 10
+num_classes = 1 # 10 if all mnist classes 2 if binary
+epochs = 12
+target = 6 # target class it is classifying for
 
 # input image dimensions
 img_rows, img_cols = 28, 28
 
 # the data, split between train and test sets
 (x_train, y_train), (x_test, y_test) = mnist.load_data()
+
+# make the data into a single class binary output (yes for 6 no for everything else)
+for i, elem in enumerate(y_test):
+    y_train[i] = (elem == target).astype(np.int)
+
+for i, elem in enumerate(y_test):
+    y_test[i] = (elem == target).astype(np.int)
+
 
 if K.image_data_format() == 'channels_first':
     x_train = x_train.reshape(x_train.shape[0], 1, img_rows, img_cols)
@@ -38,8 +48,8 @@ print(x_train.shape[0], 'train samples')
 print(x_test.shape[0], 'test samples')
 
 # convert class vectors to binary class matrices
-y_train = keras.utils.to_categorical(y_train, num_classes)
-y_test = keras.utils.to_categorical(y_test, num_classes)
+# y_train = keras.utils.to_categorical(y_train, num_classes)
+# y_test = keras.utils.to_categorical(y_test, num_classes)
 
 model = Sequential()
 model.add(Conv2D(32, kernel_size=(3, 3),
@@ -54,8 +64,8 @@ model.add(Dropout(0.5))
 # Using softmax output layer activation for a probability output
 model.add(Dense(num_classes, activation='softmax'))
 
-model.compile(loss=keras.losses.categorical_crossentropy,
-              optimizer=keras.optimizers.Adadelta(),
+model.compile(loss='binary_crossentropy',
+              optimizer='adam',
               metrics=['accuracy'])
 
 model.fit(x_train, y_train,
